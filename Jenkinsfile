@@ -6,9 +6,10 @@ pipeline {
     }
     environment {
         appVersion = ""
-        ACC_ID = "764694154057"
-        REGION = "us-east-1"
-
+        ACC_ID     = "764694154057"
+        REGION     = "us-east-1"
+        AWS_CREDS  = "aws-creds"
+        ECR_REGISTRY = "764694154057.dkr.ecr.us-east-1.amazonaws.com"
     }
     options {
         // disableConcurrentBuilds()
@@ -47,10 +48,10 @@ pipeline {
         stage('Build Image') {
             steps {
                 script{
-                    withAWS(credentials: 'aws-creds' , region: "${REGION}") {
+                    withAWS(credentials: "${AWS_CREDS}" , region: "${REGION}") {
                     // Commands here have AWS auth
                         sh """
-                            aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ACC_ID} .dkr.ecr.${REGION}.amazonaws.com
+                            aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com
                             docker build -t ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com/roboshop/catalogue:${appVersion} .
                             docker push ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com/roboshop/catalogue:${appVersion}
                         """
