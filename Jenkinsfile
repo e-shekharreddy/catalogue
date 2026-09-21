@@ -8,7 +8,6 @@ pipeline {
         appVersion = ""
         ACC_ID = "764694154057"
         REGION = "us-east-1"
-        AWS_CREDS = "aws-creds"
 
     }
     options {
@@ -48,7 +47,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 script{
-                    withAWS(credentials: "${AWS_CREDS}", region: "${REGION}") {
+                    withAWS(credentials: 'aws-creds' , region: "${REGION}") {
                     // Commands here have AWS auth
                         sh """
                             aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ACC_ID} .dkr.ecr.${REGION}.amazonaws.com
