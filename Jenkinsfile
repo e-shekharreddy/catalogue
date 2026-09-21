@@ -8,6 +8,7 @@ pipeline {
         appVersion = ""
         ACC_ID = "764694154057"
         REGION = "us-east-1"
+        AWS_CREDS = "aws-creds"
 
     }
     options {
