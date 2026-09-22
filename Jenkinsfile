@@ -1,8 +1,8 @@
 @Library('jenkins-test-library') _
 
 def configMap = [
-    project: "roboshop",
-    component: "catalogue"
+    project: "roboshop-2",
+    component: "catalogue-2"
 ]
 
 echo "Triggering the library pipeline"
