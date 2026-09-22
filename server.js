@@ -13,7 +13,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const pino = require('pino');
 const expPino = require('express-pino-logger');
-const crypto = require('crypto'); // Added for secure random integer generation
+const crypto = require('node:crypto'); // Added for secure random integer generation
 
 const logger = pino({
     level: 'info',
