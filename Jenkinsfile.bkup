@@ -1,10 +1,10 @@
 pipeline {
-    /* agent {
+    agent {
         node {
             label 'ROBOSHOP'
             component: "catalogue"
         }
-    } */
+    }
     environment {
         appVersion = ""
         ACC_ID     = "764694154057"
