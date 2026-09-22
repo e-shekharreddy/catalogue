@@ -55,6 +55,14 @@ pipeline {
                 }
             }
         }
+        stage('Quality Gate') {
+            steps {
+                // Set a timeout so the pipeline doesn't hang if SonarQube is unresponsive
+                timeout(time: 2, unit: 'MINUTES') { 
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
         stage('Build Image') {
             steps {
                 script{
