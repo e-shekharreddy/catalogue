@@ -63,6 +63,52 @@ pipeline {
                 }
             }
         }
+        stage('Check Dependabot Alerts') {
+            environment {
+                REPO_OWNER = 'e-shekharreddy'
+                REPO_NAME  = 'catalogue'
+            }
+            steps {
+                script {
+                    // Retrieve token securely from Jenkins Credentials ID 'GITHUB_TOKEN'
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GH_TOKEN')]) {
+                        
+                        // Fetch count of open HIGH and CRITICAL alerts
+                        def alertCount = sh(
+                            script: """
+                                curl -s -H "Accept: application/vnd.github+json" \
+                                    -H "Authorization: Bearer ${GH_TOKEN}" \
+                                    -H "X-GitHub-Api-Version: 2022-11-28" \
+                                    "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dependabot/alerts?state=open&severity=high,critical" \
+                                | jq '. | length'
+                            """,
+                            returnStdout: true
+                        ).trim()
+
+                        // Validate API response (ensures jq returned a valid integer)
+                        if (!alertCount.isInteger()) {
+                            error("Failed to fetch Dependabot alerts. Ensure github-token has 'security_events' read permissions.")
+                        }
+
+                        echo "Open High/Critical Dependabot Alerts Found: ${alertCount}"
+
+                        if (alertCount.toInteger() > 0) {
+                            // Display detailed alert information in execution output before failing
+                            sh """
+                                curl -s -H "Accept: application/vnd.github+json" \
+                                    -H "Authorization: Bearer ${GH_TOKEN}" \
+                                    -H "X-GitHub-Api-Version: 2022-11-28" \
+                                    "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dependabot/alerts?state=open&severity=high,critical" \
+                                | jq '.[] | {number: .number, severity: .security_advisory.severity, summary: .security_advisory.summary, package: .dependency.package.name}'
+                            """
+                            error("Pipeline failed: Found ${alertCount} open HIGH or CRITICAL Dependabot alert(s) in ${REPO_OWNER}/${REPO_NAME}.")
+                        } else {
+                            echo "No open HIGH or CRITICAL Dependabot vulnerabilities found. Proceeding."
+                        }
+                    }
+                }
+            }
+        }
         stage('Build Image') {
             steps {
                 script{
