@@ -6,13 +6,14 @@ instana({
         enabled: true
     }
 }); 
-// some cha nge
+// some change
 // some changes, few more changes
 const { MongoClient, ObjectId } = require('mongodb');
 const bodyParser = require('body-parser');
 const express = require('express');
 const pino = require('pino');
 const expPino = require('express-pino-logger');
+const crypto = require('crypto'); // Added for secure random integer generation
 
 const logger = pino({
     level: 'info',
@@ -29,6 +30,7 @@ let collection;
 let mongoConnected = false;
 
 const app = express();
+app.disable('x-powered-by'); // Fixes Issue 1: Disables default X-Powered-By header
 
 app.use(expLogger);
 
@@ -47,7 +49,10 @@ app.use((req, res, next) => {
         "us-west1"
     ];
     let span = instana.currentSpan();
-    span.annotate('custom.sdk.tags.datacenter', dcs[Math.floor(Math.random() * dcs.length)]);
+    
+    // Fixes Issue 2: Uses crypto.randomInt instead of Math.random
+    const randomIndex = crypto.randomInt(0, dcs.length);
+    span.annotate('custom.sdk.tags.datacenter', dcs[randomIndex]);
 
     next();
 });
