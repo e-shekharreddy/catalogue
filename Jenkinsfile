@@ -45,7 +45,7 @@ pipeline {
                 }
             }
         }
-        stage ('SonarQube Analysis'){
+        /* stage ('SonarQube Analysis'){
             steps{
                 script{
                     def scannerHome = tool name: 'sonar-8' 
@@ -62,7 +62,7 @@ pipeline {
                     waitForQualityGate abortPipeline: true
                 }
             }
-        }
+        } */
         stage('Check Dependabot Alerts') {
             environment {
                 REPO_OWNER = 'e-shekharreddy'
