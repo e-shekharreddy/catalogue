@@ -1,4 +1,4 @@
-@Library('jenkins-test-Library') _
+@Library('jenkins-test-library') _
 
 def configMap = [
     project: "roboshop",
