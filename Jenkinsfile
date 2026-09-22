@@ -112,14 +112,9 @@ pipeline {
         stage('Build Image') {
             steps {
                 script{
-                    withAWS(credentials: "${AWS_CREDS}" , region: "${REGION}") {
-                    // Commands here have AWS auth
-                        sh """
-                            aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com
-                            docker build -t ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com/roboshop/catalogue:${appVersion} .
-                            docker push ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com/roboshop/catalogue:${appVersion}
-                        """
-                    }
+                    sh """
+                        docker build -t ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com/roboshop/catalogue:${appVersion} .
+                    """
                 }
                 
             }
@@ -165,7 +160,20 @@ pipeline {
                 }
             }
         }
-        
+        stage('Push Image to ECR') {
+            steps {
+                script{
+                    withAWS(credentials: "${AWS_CREDS}" , region: "${REGION}") {
+                    // Commands here have AWS auth
+                        sh """
+                            aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com
+                            docker push ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com/roboshop/catalogue:${appVersion}
+                        """
+                    }
+                }
+                
+            }
+        }
     }
     
 
